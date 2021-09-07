@@ -612,12 +612,13 @@ static int am_return_logout_response(request_rec *r,
                               LassoProfile *profile)
 {
     if (profile->msg_url && profile->msg_body) {
+        /* tricky, but it works with wso2is 5.11.0 /*
         return OK;
         /* POST binding response */
-        AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
+        /* AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
                       "Error building logout response message."
                       " POST binding is unsupported.");
-        return HTTP_INTERNAL_SERVER_ERROR;
+        return HTTP_INTERNAL_SERVER_ERROR; */
     } else if (profile->msg_url) {
         /* HTTP-Redirect binding response */
         apr_table_setn(r->headers_out, "Location",

@@ -612,6 +612,7 @@ static int am_return_logout_response(request_rec *r,
                               LassoProfile *profile)
 {
     if (profile->msg_url && profile->msg_body) {
+        return OK;
         /* POST binding response */
         AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
                       "Error building logout response message."
@@ -708,8 +709,41 @@ static int am_handle_logout_request(request_rec *r,
     am_dir_cfg_rec *cfg = am_get_dir_cfg(r);
 
     am_diag_printf(r, "enter function %s\n", __func__);
+    /* ivan debug
+    AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
+                        "SAML MSG: %s",msg);
+    */
 
     /* Process the logout message. Ignore missing signature. */
+
+    msg = am_extract_query_parameter(r->pool, msg, "SAMLRequest");
+    if (msg == NULL) {
+        AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
+                      "Missing SAMLRequest param handling logout"
+                      " request.");
+        rc = HTTP_BAD_REQUEST;
+        goto exit;
+    }
+
+    /* ivan debug
+    AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
+                        "SAML MSG substr: %s", msg);
+    */
+
+    res = am_urldecode(msg);
+    if (res != OK) {
+        AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, rc, r,
+                      "Could not urldecode SAMLRequest value handling logout"
+                      " request.");
+        rc = HTTP_BAD_REQUEST;
+        goto exit;
+    }
+
+    /* ivan debug
+    AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
+                        "SAML MSG urldecode: %s", msg);
+    */
+
     res = lasso_logout_process_request_msg(logout, msg);
 #ifdef HAVE_lasso_profile_set_signature_verify_hint
     if(res != 0 && res != LASSO_DS_ERROR_SIGNATURE_NOT_FOUND &&
@@ -3387,6 +3421,11 @@ static int am_handle_login(request_rec *r)
     char *return_to;
     int is_passive;
     int ret;
+
+    /* ivan debug
+    AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
+                      "LOOOOOOOOOOOOOOOGIIIIIIIIIIIIIIINNNNNNNNNNNNNNNNN.");
+    */
 
     am_diag_printf(r, "enter function %s\n", __func__);
 

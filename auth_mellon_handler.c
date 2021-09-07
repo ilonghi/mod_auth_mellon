@@ -612,7 +612,7 @@ static int am_return_logout_response(request_rec *r,
                               LassoProfile *profile)
 {
     if (profile->msg_url && profile->msg_body) {
-        /* tricky, but it works with wso2is 5.11.0 /*
+        /* tricky, but it works with wso2is 5.11.0 */
         return OK;
         /* POST binding response */
         /* AM_LOG_RERROR(APLOG_MARK, APLOG_ERR, 0, r,
